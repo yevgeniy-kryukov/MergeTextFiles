@@ -2,8 +2,13 @@ package merge_text_files;
 
 import java.util.Scanner;
 import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.nio.charset.StandardCharsets;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -83,24 +88,35 @@ public class Main {
 	}
 	
 	private static void mergeFiles(ArrayList<File> listFiles, File outputFile) {
-		final int BUF_SIZE = 256; 
-		char buf[] = new char[BUF_SIZE];
-		int c;
+		String str;
 		
 		try {
-			FileWriter writer = new FileWriter(outputFile.getAbsolutePath(), true);
-			for (File item: listFiles) {	
-				FileReader reader = new FileReader(item.getAbsolutePath());
-				while ((c = reader.read(buf)) > 0) {
-					if (c < BUF_SIZE) {
-						buf = Arrays.copyOf(buf, c);
-					}
-					writer.write(buf);
+			
+			FileOutputStream fileOutputStream = new FileOutputStream(outputFile);
+			OutputStreamWriter outputStreamWriter = new OutputStreamWriter(fileOutputStream, StandardCharsets.UTF_8);
+			BufferedWriter bufferedWriter = new BufferedWriter(outputStreamWriter);
+			
+			for (File item: listFiles) {
+				FileInputStream fileInputStream = new FileInputStream(item);
+				InputStreamReader inputStreamReader = new InputStreamReader(fileInputStream, StandardCharsets.UTF_8);
+				BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
+				
+				while ((str = bufferedReader.readLine()) != null) {
+					bufferedWriter.write(str);
+					bufferedWriter.newLine();
 				}
-				reader.close();
+				
+				fileInputStream.close();
+				inputStreamReader.close();
+				bufferedReader.close();
 			}
-			writer.flush();
-			writer.close();
+			
+			bufferedWriter.flush();
+			
+			fileOutputStream.close();
+			outputStreamWriter.close();
+			bufferedWriter.close();
+			
 		} catch (IOException ex) {
 			System.out.println(ex.getMessage());
 		}
