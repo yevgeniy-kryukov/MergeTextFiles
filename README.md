@@ -1,2 +1,2 @@
 # MergeTextFiles
-MergeTextFiles
+Merge text files.
